@@ -1,15 +1,23 @@
-const http = require('http')
+const express = require('express')
 const chalk = require('chalk')
+const path = require('path')
+const {addNote, getNotes, removeNote} = require('./notes.controller')
 
-const port = 3000
+const port = 3005
+const app = express()
 
-const server = http.createServer((req, res) => {
-  console.log('Request object', req.method)
-  console.log('Request url', req.url)
+app.set('view engine', 'ejs')
+app.set('views', 'pages')
 
-  res.end('Hello from server!')
-})
+app.use(express.static(path.resolve(__dirname, 'public')))
+app.use(express.urlencoded({
+  extended: true
+}))
 
-server.listen(port, () => {
-  console.log(chalk.green(`Server has been started on port ${port}`))
+app.get('/', async (req, res) => {
+  res.render('index', {
+    title: 'Express App',
+    notes: await getNotes(),
+    created: false
+  })
 })
